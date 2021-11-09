@@ -40,7 +40,7 @@ public class SonarApiServiceImpl implements SonarApiService{
 			    .fromUriString(historyMetrics)
 			    // Add query parameter
 			    //.queryParam("component", "com.infy.sonar:sonar-spring-demo")
-				.queryParam("token", "c6822504a1813787e4a87f47b1238645fd6ec5be")
+				// .queryParam("token", "c6822504a1813787e4a87f47b1238645fd6ec5be")
 				.queryParam("component", "PRPS")
 			    .queryParam("metrics", metrics);
 		MeasureHistoryResponse measureHistoryResponse = restTemplate.getForObject(builder.toUriString(), MeasureHistoryResponse.class);
