@@ -4,12 +4,18 @@ import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import com.mht.exposeapi.dto.Measure;
 import com.mht.exposeapi.dto.MeasureHistory;
 import com.mht.exposeapi.dto.MeasureHistoryResponse;
@@ -29,41 +35,52 @@ import com.mht.exposeapi.dto.Range;
 
 @Service()
 public class SonarApiServiceImpl implements SonarApiService{
-
 	@Override
 	public List<List<Object>> getDataPoint(Range range, String metrics) {
+		String accessToken = "3c29f93c18fdf1b2713302f93b15078ca1c7a77e:";
+		HttpHeaders headers = new HttpHeaders();
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        headers.add("Authorization", "Basic " + new String(Base64.getEncoder().encode(accessToken.getBytes())));
+		HttpEntity entity = new HttpEntity(headers);
 		List<List<Object>> datapoints = new ArrayList<>();
 		RestTemplate restTemplate = new RestTemplate();
-		// String historyMetrics = "http://10.101.0.204:9000/api/measures/search_history";
-		String historyMetrics = "http://10.101.0.204:9000/api/measures/search_history?metrics=code_smells,bugs,vulnerabilities,security_hotspots";
-		UriComponentsBuilder builder = UriComponentsBuilder
-			    .fromUriString(historyMetrics)
+		String historyMetrics = "http://localhost:8080/api/measures/search_history";
+		// String historyMetrics = "http://10.101.0.204:9000/api/measures/search_history?metrics=code_smells,bugs,vulnerabilities,security_hotspots";
+		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(historyMetrics)
+			    // .fromUriString(historyMetrics)
 			    // Add query parameter
 			    //.queryParam("component", "com.infy.sonar:sonar-spring-demo")
-				// .queryParam("token", "c6822504a1813787e4a87f47b1238645fd6ec5be")
 				.queryParam("component", "PRPS")
-			    .queryParam("metrics", metrics);
-		MeasureHistoryResponse measureHistoryResponse = restTemplate.getForObject(builder.toUriString(), MeasureHistoryResponse.class);
-		System.out.println("sonar response - "+measureHistoryResponse);
-		for(Measure measure: measureHistoryResponse.getMeasures()) {
-			for(MeasureHistory measureHistory: measure.getHistory()) {
-				ZonedDateTime zonedDateTime = measureHistory.getDate();
-				System.out.println("zoned time - "+zonedDateTime);
-				Long epochSecond = zonedDateTime.toEpochSecond();
-				LocalDateTime historyTime = zonedDateTime.toLocalDateTime();
-				LocalDateTime rangeFrom = range.getFrom();
-				LocalDateTime rangeTo = range.getTo();
-				System.out.println("history - "+historyTime);
-				System.out.println("from - "+rangeFrom);
-				System.out.println("to - "+rangeTo);
-				System.out.println("epoch sec - "+epochSecond);
-				if(historyTime.isBefore(range.getFrom()) || historyTime.isAfter(range.getTo()))
-					continue;
-				List<Object> datapoint = Arrays.asList(measureHistory.getValue(),epochSecond*1000);
-				datapoints.add(datapoint);
-			}
-		}
-		return datapoints;
+				// .queryParam("token",accessToken)
+				.queryParam("metrics", metrics);
+		
+				ResponseEntity<MeasureHistoryResponse> measureHistoryResponse = restTemplate.exchange(builder.toUriString(),HttpMethod.GET, entity, MeasureHistoryResponse.class);
+				System.out.println("sonar response - "+measureHistoryResponse.getBody());
+				MeasureHistoryResponse sonar_response = measureHistoryResponse.getBody();
+				for(Measure measure: sonar_response.getMeasures()) {
+					for(MeasureHistory measureHistory: measure.getHistory()) {
+						ZonedDateTime zonedDateTime = measureHistory.getDate();
+						System.out.println("zoned time - "+zonedDateTime);
+						Long epochSecond = zonedDateTime.toEpochSecond();
+						LocalDateTime historyTime = zonedDateTime.toLocalDateTime();
+						LocalDateTime rangeFrom = range.getFrom();
+						LocalDateTime rangeTo = range.getTo();
+						System.out.println("history - "+historyTime);
+						System.out.println("from - "+rangeFrom);
+						System.out.println("to - "+rangeTo);
+						System.out.println("epoch sec - "+epochSecond);
+						if(historyTime.isBefore(range.getFrom()) || historyTime.isAfter(range.getTo()))
+							;//continue;
+						List<Object> datapoint = Arrays.asList(measureHistory.getValue(),epochSecond*1000);
+						datapoints.add(datapoint);
+					}
+				}
+				System.out.println(datapoints.size());
+				return datapoints;
 	}
 
 }
+
+
+					// HttpEntity<String> response = restTemplate.exchange(builder.toUriString(), HttpMethod.GET, entity, String.class);
+					// System.out.println(response.getBody());
