@@ -42,14 +42,14 @@ public class SonarAPIController {
 	@PostMapping("/search")
 	public ResponseEntity<List<String>> getMetrics(@RequestBody JSONObject request){
 		System.out.println(">>>>>> getting metrics -\n"+request);
-		List<String> metrics = Arrays.asList("coverage","new_violations","ncloc","bugs","code_smells","debt","security_hotspots");
+		List<String> metrics = Arrays.asList("coverage","new_violations","ncloc","bugs","code_smells","debt","security_hotspots","vulnerabilities","hotspots_reviewed","duplications","lines");
 		return new ResponseEntity<List<String>>(metrics, HttpStatus.OK);
 	}
 	
 	@PostMapping("/annotations")
 	public ResponseEntity<List<String>> getAnnotations(@RequestBody AnnotationRequest request){
 		System.out.println(">>>>>> getting metrics -\n"+request);
-		List<String> metrics = Arrays.asList("coverage","new_violations","ncloc","complexity");
+		List<String> metrics = Arrays.asList("coverage","new_violations","ncloc","complexity","bugs","code_smells","debt","security_hotspots","vulnerabilities","hotspots_reviewed","duplications","lines");
 		return new ResponseEntity<List<String>>(metrics, HttpStatus.OK);
 	}
 	
