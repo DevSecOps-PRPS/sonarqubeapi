@@ -37,7 +37,8 @@ import com.mht.exposeapi.dto.Range;
 public class SonarApiServiceImpl implements SonarApiService{
 	@Override
 	public List<List<Object>> getDataPoint(Range range, String metrics) {
-		String accessToken = "3c29f93c18fdf1b2713302f93b15078ca1c7a77e:";
+		// String accessToken = "3c29f93c18fdf1b2713302f93b15078ca1c7a77e:";
+		String accessToken = "c6822504a1813787e4a87f47b1238645fd6ec5be:";
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         headers.add("Authorization", "Basic " + new String(Base64.getEncoder().encode(accessToken.getBytes())));
