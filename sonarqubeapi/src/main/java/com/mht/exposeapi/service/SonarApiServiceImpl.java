@@ -45,14 +45,14 @@ public class SonarApiServiceImpl implements SonarApiService{
 		HttpEntity entity = new HttpEntity(headers);
 		List<List<Object>> datapoints = new ArrayList<>();
 		RestTemplate restTemplate = new RestTemplate();
-		// String historyMetrics = "http://localhost:8080/api/measures/search_history";
+		// String historyMetrics = "http://localhost:9000/api/measures/search_history";
 		// String historyMetrics = "http://10.101.0.204:9000/api/measures/search_history?metrics=code_smells,bugs,vulnerabilities,security_hotspots";
 		String historyMetrics = "http://10.101.0.204:9000/api/measures/search_history";
 		UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(historyMetrics)
 			    // .fromUriString(historyMetrics)
 			    // Add query parameter
 			    //.queryParam("component", "com.infy.sonar:sonar-spring-demo")
-				.queryParam("component", "PRPS")
+				.queryParam("component", "PRPS:source")
 				// .queryParam("token",accessToken)
 				.queryParam("metrics", metrics);
 		
